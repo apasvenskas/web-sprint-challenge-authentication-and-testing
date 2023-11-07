@@ -1,7 +1,37 @@
 const router = require('express').Router();
+const bcrypt = require('bcryptjs');
+const users = require('../../data/migrations/20201123181212_users')
 
-router.post('/register', (req, res) => {
-  res.end('implement register, please!');
+
+router.post('/register', async (req, res) => {
+  console.log(req.body);
+  const {username, password} = req.body
+  if (!username || !password){
+    return res.status(400).json("username and password required")
+  }
+  console.log(username, password);
+  const user = await users.findBy({username})
+    if (user) {
+      return res.status(409).json("username taken");
+    }
+    console.log(user);
+  const hashedPassword = await bcrypt.hash(password, 8);
+  const newUser = {
+    username,
+    password: hashedPassword
+  };
+  console.log(hashedPassword, newUser);
+  const [id] = await users.add(newUser);
+  res.status(201).json({
+    id,
+    username,
+    password: hashedPassword
+  })
+  console.log(id, {
+    id,
+    username,
+    password: hashedPassword
+  });
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
