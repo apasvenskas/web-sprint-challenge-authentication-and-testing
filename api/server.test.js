@@ -1,6 +1,6 @@
 const request = require('supertest');
 const server = require('./server.js');
-const users = require('./auth/auth-router.js');
+// const users = require('./auth/auth-router.js');
 
 const validUser = {username: 'testuser', password: 'testpass'};
 const invalidUser = {username: 'wronguser', password: 'wrongpass'};
@@ -13,16 +13,16 @@ test('sanity', () => {
 })
 
 describe("Post register test", () => {
-  test('should register a new user and return 201 status', async () => {
+  it('should register a new user and return 201 status', async () => {
     const res = await request(server).post('/register').send(validUser);
     expect(res.status).toBe(201)
     expect(res.body).toHaveProperty('id')
     expect(res.body).toHaveProperty('username')
     expect(res.body).toHaveProperty('password')
     })
-  test('should log in a valid user and return 200 status, welcome message and token',
+  it('should log in a valid user and return 200 status, welcome message and token',
    async () => {
-    const res = await request(server).post('register').send(incompleteUser)
+    const res = await request(server).post('/register').send(incompleteUser)
     expect(res.status).toBe(400)
     expect(res.body).toBe('username and password required')
    })
