@@ -18,6 +18,9 @@ class User extends Model {
       }
     };
   }
+  static findBy(filter) {
+   return this.query().where(filter).first();
+ }
 }
 
 module.exports = User;

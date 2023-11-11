@@ -28,15 +28,11 @@ router.post('/api/auth/register', async (req, res) => {
       return res.status(409).json("username taken");
     }
      const hashedPassword = await bcrypt.hash(password, 8);
-  const newUser = {
-    username,
-    password: hashedPassword
-  };
-    const [id] = await User.add(newUser);
+     const newUser = await User.query().insert({username, password: hashedPassword})
+     
   res.status(201).json({
-    id,
-    username,
-    password: hashedPassword
+    id: newUser.id,
+    username: newUser.username
   })
   });
   /*
@@ -71,7 +67,7 @@ router.post('/api/auth/login', async (req, res) => {
   if(!username || !password){
     return res.status(400).json({message: 'username and password required'})
   }
-  const user = User.find((u) => u.username === username)
+  const user = await User.findBy({username})
   if(!user){
     return res.status(401).json({message: 'invalid credentials'});
      }
