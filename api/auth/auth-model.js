@@ -1,20 +1,23 @@
-const db = require('../../data/dbConfig');
+const { Model } = require('objection');
+const db = require('../../data/dbConfig'); 
 
-const user = db.define('user', {
- username: {
-    type: db.Sequelize.STRING,
-    allowNull: false,
-    unique: true
- },
- password: {
-    type: db.Sequelize.STRING,
-    allowNull: false
- },
- email: {
-    type: db.Sequelize.STRING,
-    allowNull: false,
-    unique: true
- }
-});
+Model.knex(db); 
 
-module.exports = user;
+class User extends Model {
+  static get tableName() {
+    return 'users'; 
+  }
+  static get jsonSchema() {
+    return {
+      type: 'object',
+      required: ['username', 'password'],
+      properties: {
+        id: { type: 'integer' },
+        username: { type: 'string', minLength: 1, maxLength: 255 },
+        password: { type: 'string', minLength: 1, maxLength: 255 },
+      }
+    };
+  }
+}
+
+module.exports = User;

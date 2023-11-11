@@ -1,15 +1,14 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
-const users = require('../../data/migrations/20201123181212_users')
+const User = require('./auth-model')
 const jwt = require('jsonwebtoken');
-
-const secret = 'some-secret-key';
+const { JWT_SECRET } = require("./secret")
 
 const generateToken = (user) => {
   const payload = {
     subject: user.id
   };
-  const token = jwt.sign(payload, secret); 
+  const token = jwt.sign(payload, JWT_SECRET); 
   return token;
 }
 
@@ -18,34 +17,27 @@ const verifyPassword = (password, hash) => {
 }
 
 
-router.post('/register', async (req, res) => {
+router.post('/api/auth/register', async (req, res) => {
   console.log(req.body);
   const {username, password} = req.body
   if (!username || !password){
     return res.status(400).json("username and password required")
   }
-  console.log(username, password);
-  const user = await users.findBy({username})
+  const user = await User.findBy({username})
     if (user) {
       return res.status(409).json("username taken");
     }
-    console.log(user);
-  const hashedPassword = await bcrypt.hash(password, 8);
+     const hashedPassword = await bcrypt.hash(password, 8);
   const newUser = {
     username,
     password: hashedPassword
   };
-  console.log(hashedPassword, newUser);
-  const [id] = await users.add(newUser);
+    const [id] = await User.add(newUser);
   res.status(201).json({
     id,
     username,
     password: hashedPassword
   })
-  console.log(id, {
-    id,
-    username,
-    password: hashedPassword
   });
   /*
     IMPLEMENT
@@ -72,14 +64,14 @@ router.post('/register', async (req, res) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-});
 
-router.post('/login', async (req, res) => {
+
+router.post('/api/auth/login', async (req, res) => {
   const {username, password} = req.body
   if(!username || !password){
     return res.status(400).json({message: 'username and password required'})
   }
-  const user = users.find((u) => u.username === username)
+  const user = User.find((u) => u.username === username)
   if(!user){
     return res.status(401).json({message: 'invalid credentials'});
      }
@@ -89,6 +81,7 @@ router.post('/login', async (req, res) => {
      }
      const token = generateToken(user)
      res.status(200).json({ message: `welcome, ${user.username}`, token });
+    });
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -112,6 +105,6 @@ router.post('/login', async (req, res) => {
     4- On FAILED login due to `username` not existing in the db, or `password` being incorrect,
       the response body should include a string exactly as follows: "invalid credentials".
   */
-});
+
 
 module.exports = router;
