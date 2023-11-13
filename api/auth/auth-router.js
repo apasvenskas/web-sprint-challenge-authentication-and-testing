@@ -16,25 +16,29 @@ const verifyPassword = (password, hash) => {
   return bcrypt.compare(password, hash);
 }
 
-
 router.post('/api/auth/register', async (req, res) => {
-  console.log(req.body);
-  const {username, password} = req.body
-  if (!username || !password){
-    return res.status(400).json("username and password required")
-  }
-  const user = await User.findBy({username})
+  try {
+    console.log(req.body);
+    const {username, password} = req.body
+    if (!username || !password){
+      return res.status(400).json("username and password required")
+    }
+    const user = await User.findBy({username})
     if (user) {
       return res.status(409).json("username taken");
     }
-     const hashedPassword = await bcrypt.hash(password, 8);
-     const newUser = await User.query().insert({username, password: hashedPassword})
-     
-  res.status(201).json({
-    id: newUser.id,
-    username: newUser.username
-  })
-  });
+    const hashedPassword = await bcrypt.hash(password, 8);
+    const newUser = await User.query().insert({username, password: hashedPassword})
+    
+    res.status(201).json({
+      id: newUser.id,
+      username: newUser.username
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error });
+  }
+});
+
   /*
     IMPLEMENT
     You are welcome to build additional middlewares to help with the endpoint's functionality.
@@ -60,7 +64,6 @@ router.post('/api/auth/register', async (req, res) => {
     4- On FAILED registration due to the `username` being taken,
       the response body should include a string exactly as follows: "username taken".
   */
-
 
 router.post('/api/auth/login', async (req, res) => {
   const {username, password} = req.body
