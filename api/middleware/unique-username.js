@@ -5,7 +5,7 @@ async function uniqueUsername(req, res, next) {
         const { username } = req.body;
         const user = await User.getByUsername({ username })
         if (user) {
-            res.status(400).json({ message: 'username is already taken' });
+            res.status(400).json({ message: 'username taken' });
         } else {
             next();
         }
