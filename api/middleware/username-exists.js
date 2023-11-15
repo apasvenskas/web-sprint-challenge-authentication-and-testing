@@ -8,7 +8,7 @@ async function usernameExists(req, res, next) {
         } else {
             const user = await User.getByUsername(username)
             if(!user) {
-                res.status(401).json({ message: 'invalid credentials' });
+                next();
             } else {
                 req.user = user;
                 next();

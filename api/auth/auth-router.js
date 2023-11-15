@@ -39,13 +39,13 @@ router.post("/register", uniqueUsername, async (req, res) => {
   }
  });
 
-router.post("/login", usernameExists, async (req, res) => {
+ router.post("/login", usernameExists, async (req, res) => {
   try {
     const {
       body: { password },
       user,
     } = req;
-    if (bcrypt.compareSync(password, user.password)) {
+    if (user && bcrypt.compareSync(password, user.password)) {
       res.json({
         message: `welcome, ${user.username}`,
         token: generateToken(user),
@@ -54,7 +54,8 @@ router.post("/login", usernameExists, async (req, res) => {
       res.status(401).json({ message: "invalid credentials" });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.log(error);
+    res.status(500).json({ message: "An error occurred while logging in." });
   }
 });
 
