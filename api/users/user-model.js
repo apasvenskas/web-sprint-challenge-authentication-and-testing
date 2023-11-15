@@ -13,3 +13,4 @@ async function insert(user) {
 function getByUsername(username) {
   return db('users').where({ username }).first();
 }
+

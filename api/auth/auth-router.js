@@ -18,24 +18,26 @@ function generateToken(user) {
 }
 router.post("/register", uniqueUsername, async (req, res) => {
   try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      res.status(400).json({ message: "username and password required" });
-    } else {
-      const newUser = await User.insert({
-        username,
-        password: bcrypt.hashSync(password, 8),
-      });
-      res.status(201).json(newUser);
-    }
+     const { username, password } = req.body;
+ 
+     if (!username || !password) {
+       res.status(400).json({ message: "username and password required" });
+     } else {
+       const userExists = await User.getByUsername(username);
+       if (userExists) {
+         res.status(400).json({ message: "username taken" });
+       } else {
+         const newUser = await User.insert({
+           username,
+           password: bcrypt.hashSync(password, 8),
+         });
+         res.status(201).json(newUser);
+       }
+     }
   } catch (error) {
-    if (error.code === "SQLITE_CONSTRAINT") {
-      res.status(400).json({ message: "username taken" });
-    } else {
-      res.status(500).json({ message: error.message });
-    }
+     res.status(500).json({ message: error.message });
   }
-});
+ });
 
 router.post("/login", usernameExists, async (req, res) => {
   try {
