@@ -8,9 +8,9 @@
 // const invalidUser = {username: 'wronguser', password: 'wrongpass'};
 // const incompleteUser = {username: '', password: ''};
 
-// test('sanity', () => {
-//   expect(true).toBe(true)
-// })
+test('sanity', () => {
+  expect(true).toBe(true)
+})
 
 // describe("POST /register", () => {
 //   beforeEach(async () => {
