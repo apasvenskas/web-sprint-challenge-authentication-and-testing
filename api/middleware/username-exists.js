@@ -2,20 +2,20 @@ const User = require('../users/user-model');
 
 async function usernameExists(req, res, next) {
     try {
-        const { username, password } = req.body;
-        if (!username || !password) {
+        const { username } = req.body;
+        if (!username) {
             res.status(400).json({ message: 'username and password required' });
         } else {
             const user = await User.getByUsername(username)
             if(!user) {
-                next();
+                return res.status(401).json({ message: 'invalid credentials' })
             } else {
                 req.user = user;
                 next();
             }
         }
     } catch (error) {
-        res.status(500).json({ message: error.message});
+        res.status(500).json({ message: "erororr occuerred during the process"});
     }
 }
 

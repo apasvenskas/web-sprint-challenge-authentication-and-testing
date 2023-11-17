@@ -7,6 +7,7 @@ const usernameExists = require("../middleware/username-exists");
 const secret = process.env.SECRET || "shh";
 
 function generateToken(user) {
+  console.log(user)
   const payload = {
     subject: user.id,
     username: user.username,
@@ -41,12 +42,17 @@ router.post("/register", uniqueUsername, async (req, res) => {
 
  router.post("/login", usernameExists, async (req, res) => {
   try {
-    const {
-      body: { password },
-      user,
-    } = req;
+    const { username, password } = req.body;
+
+    // Check if username or password is missing
+    if (!username || !password) {
+      return res.status(400).json({ message: "username and password required" });
+    }
+
+    const user = req.user;
+
     if (user && bcrypt.compareSync(password, user.password)) {
-      res.json({
+      res.status(200).json({
         message: `welcome, ${user.username}`,
         token: generateToken(user),
       });
